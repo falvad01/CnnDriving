@@ -1,3 +1,5 @@
+#enconding: utf-8
+
 import sys #movernos en nuestro So
 import os #movernos en nuestro So
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
@@ -12,8 +14,7 @@ K.clear_session() #Matamos la sescion de keras anterior
 trainingData = './Entrenamiento' #Guardamos el directorio de las imagenes
 validationData = './Validacion'
 
-dir = './model' #directorio del modelo de salida
-os.mkdir(dir)
+
 
 gen = 20 #generaciones
 alt = 100 # tamanio imagenes
@@ -34,9 +35,9 @@ learnigRate = 0.0005 #ajustes de la red neuronal para ajuste optimo
 
 dataGenTraining = ImageDataGenerator(
     rescale = 1./255, #los valores de los pixeles se reducen a 0 1
-    shear_range = 0.3, #enseñamos al algortimo que las imagenes pueden estar inclinadas
-    zoom_range = 0.3, #enseñamos al algoritmo que algunas imaenes estan mas cerca que otras
-    horizontal_flip = True #invertimos las imagenes para enseñar al aglorimo direccionalidad
+    shear_range = 0.3, #enseniamos al algortimo que las imagenes pueden estar inclinadas
+    zoom_range = 0.3, #enseniamos al algoritmo que algunas imaenes estan mas cerca que otras
+    horizontal_flip = True #invertimos las imagenes para enseniar al aglorimo direccionalidad
 )
 
 dataGenValidation = ImageDataGenerator(
@@ -132,6 +133,9 @@ cnn.fit( #con los que vamos a entrenar la imagen
 )
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
+
+dir = './model/' #directorio del modelo de salida
+os.mkdir(dir)
 
 cnn.save('./model/model.h') #guardamos la estructura del modelo
 cnn.save_weights('./model/model.h') #gaurdamos los pesos de cada capa
