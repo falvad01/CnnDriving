@@ -11,3 +11,4 @@ from tensorflow.python.keras import backend as K #Si hay una sesion de keras la 
 K.clear_session() #Matamos la sescion de keras anterior
 
 
+
