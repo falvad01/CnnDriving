@@ -7,17 +7,18 @@ from tensorflow.python.keras.layers import Dropout, Flatten, Dense, Activation #
 from tensorflow.python.keras.layers import  Convolution2D, MaxPooling2D #Capas de la red neuronal
 from tensorflow.python.keras import backend as K #Si hay una sesion de keras la mata
 
-
 K.clear_session() #Matamos la sescion de keras anterior
 
 trainingData = './Entrenamiento' #Guardamos el directorio de las imagenes
 validationData = './Validacion'
 
+dir = './model' #directorio del modelo de salida
+os.mkdir(dir)
 
 gen = 20 #generaciones
 alt = 100 # tamanio imagenes
 lon = 100
-bachSize = 32 
+batchSize = 32 
 steps = 1000 # numero de veces que se procesa la imagen por gen
 validationSteps = 200
 conv1Filters = 32 #profundidad de la imagen en cada convolucion
@@ -45,19 +46,19 @@ dataGenValidation = ImageDataGenerator(
 trainingImage = dataGenTraining.flow_from_directory(#transformamos las imagenes
     trainingData,
     target_size = (alt,lon),
-    bach_size = bachSize,
-    class_mode = 'Categotical' #clasifacion categorica de cada imgen, recta curbad y cubai
+    batch_size = batchSize ,
+    class_mode = 'categorical' #clasifacion categorica de cada imgen, recta curbad y cubai
 
 )
 
-validationImage = dataGenValidation.flow_from_director(
+validationImage = dataGenValidation.flow_from_directory(
     validationData,
     target_size = (alt,lon),
-    bach_size = bachSize,
-    class_mode = 'Categotical'
+    batch_size = batchSize ,
+    class_mode = 'categorical'
 )
 
-#CREAMOS LAS RED CNN
+#CREAMOS LA RED CNN
 
 cnn = Sequential() #La red son varias capas apiladas
 
@@ -66,7 +67,7 @@ cnn.add(#creamos la primera capa
         conv1Filters,  #32 filtros
         filter1Size, # de tamanio 3,3
         padding = 'same',
-        imput_shape = (alt,lon),  #las imagenes de entrada son de este tamanio
+        input_shape = (alt,lon,3),  #las imagenes de entrada son de este tamanio
         activation = 'relu' 
     )
 )
@@ -119,23 +120,18 @@ cnn.compile(
     optimizer = optimizers.Adam(
         lr = learnigRate #optimizador 
     ),
-    metrics = ['acuracy']
+    metrics = ['accuracy']
 )
 
 cnn.fit( #con los que vamos a entrenar la imagen
     trainingImage,
     steps_per_epoch = steps,
     epochs = gen,
-    imagen_validacion = validationImage,
+    validation_data = validationImage,
     validation_steps = validationSteps
 )
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
-
-dir = './model'
-
-if not os.path.exists(dir)
-    os.mkdir(dir)
 
 cnn.save('./model/model.h') #guardamos la estructura del modelo
 cnn.save_weights('./model/model.h') #gaurdamos los pesos de cada capa
