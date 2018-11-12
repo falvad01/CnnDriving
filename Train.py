@@ -14,8 +14,6 @@ K.clear_session() #Matamos la sescion de keras anterior
 trainingData = './Entrenamiento' #Guardamos el directorio de las imagenes
 validationData = './Validacion'
 
-
-
 gen = 20 #generaciones
 alt = 100 # tamanio imagenes
 lon = 100
@@ -83,8 +81,7 @@ cnn.add( #tercera capa
     Convolution2D(
         conv2Filters,
         filter2Size,
-        padding = 'same',
-        activation = 'relu' 
+        padding = 'same' 
     )
 )
 
@@ -124,13 +121,14 @@ cnn.compile(
     metrics = ['accuracy']
 )
 
-cnn.fit( #con los que vamos a entrenar la imagen
+cnn.fit_generator( 
     trainingImage,
     steps_per_epoch = steps,
     epochs = gen,
+    initial_epoch = 0,
     validation_data = validationImage,
     validation_steps = validationSteps
-)
+) #con los que vamos a entrenar la imagen
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
 
@@ -138,4 +136,4 @@ dir = './model/' #directorio del modelo de salida
 os.mkdir(dir)
 
 cnn.save('./model/model.h') #guardamos la estructura del modelo
-cnn.save_weights('./model/model.h') #gaurdamos los pesos de cada capa
+cnn.save_weights('./model/model.h') #guardamos los pesos de cada capa
