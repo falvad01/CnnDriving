@@ -1,5 +1,15 @@
 #enconding: utf-8
 
+
+
+##DUDAS##
+##OPTIMIZACION EN UNITY
+##SI SE PODRIA ENTRENAR LA RED CNN CON IMAGENES REALES O TIENEN QUE SER DEL JUEGO
+##A LA HORA DE CLASICAR LAS IMAGENES SERIA EN CURVAS DERECHA, CURVAS IZQUIERDA Y RECTAS O TENDRIA QUE PENSAR EN OTRO TIPO DE CLASIFICACION
+##NUMERO DE FOTOS OPTIMO PARA ENTRENAR LA RED
+##ERROES EN EL FROM, QUE SE SOLUCIONAN SOLOS
+
+
 import sys #movernos en nuestro So
 import os #movernos en nuestro So
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
