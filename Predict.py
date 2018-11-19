@@ -26,8 +26,9 @@ def predict(file):
 lon = 100
 alt = 100 
 
-model = './model/model.h'
-pesosModelo = './model/model.h'
+model = './model/model.h5'
+pesosModelo = './model/model.h5'
 cnn = load_model(model) #cargamos el modelo de la red
 cnn.load_weights(pesosModelo) #cargamos los pesos de la red
+
 predict('1.jpeg')

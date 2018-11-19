@@ -4,6 +4,7 @@
 ##OPTIMIZACION EN UNITY
 ##LAS IMAGENES DE ENTRENAMIENTO Y VALIDACION, DIFERENCIAS Y SI PUEDEN SER IGUALES
 ##SI SE PODRIA ENTRENAR LA RED CNN CON IMAGENES REALES O TIENEN QUE SER DEL JUEGO
+##PROBLEMA AL CARGAR EL MODELO
 ##A LA HORA DE CLASICAR LAS IMAGENES SERIA EN CURVAS DERECHA, CURVAS IZQUIERDA Y RECTAS O TENDRIA QUE PENSAR EN OTRO TIPO DE CLASIFICACION
 ##NUMERO DE FOTOS OPTIMO PARA ENTRENAR LA RED
 ##ERROES EN EL FROM, QUE SE SOLUCIONAN SOLOS
@@ -11,21 +12,22 @@
 
 import sys #movernos en nuestro So
 import os #movernos en nuestro So
+
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
 from tensorflow.python.keras.models import Sequential #Nos permite hacer redes neuronales secuenciales, para que las capas esten en orden
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense, Activation #
-from tensorflow.python.keras.layers import  Convolution2D, MaxPooling2D #Capas de la red neuronal
+from tensorflow.python.keras.layers import Convolution2D, MaxPooling2D #Capas de la red neuronal
 from tensorflow.python.keras import backend as K #Si hay una sesion de keras la mata
 
 K.clear_session() #Matamos la sescion de keras anterior
 
 trainingData = './Entrenamiento' #Guardamos el directorio de las imagenes
 validationData = './Validacion'
-
+ 
 gen = 20 #generaciones
-alt = 100 # tamanio imagenes
-lon = 100
+alt = 150 # tamanio imagenes 
+lon = 150
 batchSize = 32 
 steps = 1000 # numero de veces que se procesa la imagen por gen
 validationSteps = 200
@@ -144,5 +146,5 @@ cnn.fit_generator(
 dir = './model/' #directorio del modelo de salida
 os.mkdir(dir)
 
-cnn.save('./model/model.h') #guardamos la estructura del modelo
-cnn.save_weights('./model/model.h') #guardamos los pesos de cada capa
+cnn.save('./model/model.h5') #guardamos la estructura del modelo
+cnn.save_weights('./model/model.h5') #guardamos los pesos de cada capa
