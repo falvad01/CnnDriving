@@ -13,7 +13,7 @@
 
 import sys #movernos en nuestro So
 import os #movernos en nuestro So
-
+import simplejson
 
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
@@ -145,9 +145,19 @@ cnn.fit_generator(
 ) #con los que vamos a entrenar la imagen
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
+## serialize model to JSON
+model_json = cnn.to_json()
+with open("Data/model.json", "w") as json_file:
+    json_file.write(simplejson.dumps(simplejson.loads(model_json), indent=4))
 
+# serialize weights to HDF5
+cnn.save_weights("Data/model.h5")
+print("Saved model to disk")
+
+"""
 dir = './model/' #directorio del modelo de salida
 os.mkdir(dir)
 
 cnn.save('./model/model.h5') #guardamos la estructura del modelo
 cnn.save_weights('./model/model_wheights.h5') #guardamos los pesos de cada capa
+"""
