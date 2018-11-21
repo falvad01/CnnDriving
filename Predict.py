@@ -23,12 +23,12 @@ def predict(file):
 
 ###############################################
 
-lon = 100
-alt = 100 
+lon = 150
+alt = 150 
 
-model = './model/model.h5'
-pesosModelo = './model/model.h5'
-cnn = load_model(model) #cargamos el modelo de la red
-cnn.load_weights(pesosModelo) #cargamos los pesos de la red
+
+
+cnn = load_model('./model/model.h5') #cargamos el modelo de la red
+cnn.load_weights('./model/model_weights.h5') #cargamos los pesos de la red
 
 predict('1.jpeg')

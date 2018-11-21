@@ -1,4 +1,5 @@
 #enconding: utf-8
+##si da error instalar pillow con CONDA NO CON PIP
 
 ##DUDAS##
 ##OPTIMIZACION EN UNITY
@@ -13,12 +14,14 @@
 import sys #movernos en nuestro So
 import os #movernos en nuestro So
 
+
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
 from tensorflow.python.keras.models import Sequential #Nos permite hacer redes neuronales secuenciales, para que las capas esten en orden
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense, Activation #
 from tensorflow.python.keras.layers import Convolution2D, MaxPooling2D #Capas de la red neuronal
 from tensorflow.python.keras import backend as K #Si hay una sesion de keras la mata
+
 
 K.clear_session() #Matamos la sescion de keras anterior
 
@@ -147,4 +150,4 @@ dir = './model/' #directorio del modelo de salida
 os.mkdir(dir)
 
 cnn.save('./model/model.h5') #guardamos la estructura del modelo
-cnn.save_weights('./model/model.h5') #guardamos los pesos de cada capa
+cnn.save_weights('./model/model_wheights.h5') #guardamos los pesos de cada capa
