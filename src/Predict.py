@@ -1,4 +1,5 @@
 import numpy as np
+import simplejson
 from keras.preprocessing.image import load_img, img_to_array
 from keras.models import load_model
 
@@ -8,7 +9,7 @@ def predict(file):
     x = img_to_array(x)#trnsformamos la imagen en array
     x = np.expand_dims(x,axis =  0)
 
-    array = loaded_model.predict(x) #Creamos el array de las soluciones
+    array= cnn.predict(x) #Creamos el array de las soluciones
     result = array[0]
     answer = np.argmax(result)
 
@@ -27,20 +28,22 @@ lon = 150
 alt = 150 
 
 
+cnn = load_model('./model2/model.h5')
+cnn.load_weights('./model2/model_weights.h5')
 
-jsonFile = open('Data/model.json', 'r')
-loadedModelJson = jsonFile.read()
-jsonFile.close()
-loadedModel = model_from_json(loaded_model_json)
+
+"""
+# load json and create model
+json_file = open('Data/model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+loaded_model = model_from_json(loaded_model_json)
 
 # load weights into new model
 loaded_model.load_weights("Data/model.h5")
 print("Loaded model from disk")
+"""
+"""
 
-# evaluate loaded model on test data 
-# Define X_test & Y_test data first
-loaded_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-#score = loaded_model.evaluate(X_test, Y_test, verbose=0)
-print ("%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100))
-
+"""
 predict('1.jpeg')
