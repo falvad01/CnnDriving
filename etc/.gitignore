@@ -1,6 +1,4 @@
-Entrenamiento
-*.jpg
-*.jpeg
-*.png
-Data
-Validacion
+../Entrenamiento/*.csv
+../Data_CSV/*.png
+
+

@@ -14,9 +14,11 @@
 import sys #movernos en nuestro So
 import os #movernos en nuestro So 
 import pandas as pd # data processing, CSV file
+import numpy
+import csv, operator
 
-
-from tensorflow.python.keras.preprocessing.image import ImageDataitererator #Ayuda a preprocesar las imaiteres
+from numpy import genfromtxt
+from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
 from tensorflow.python.keras.models import Sequential #Nos permite hacer redes neuronales secuenciales, para que las capas esten en orden
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense, Activation #
@@ -26,9 +28,9 @@ from tensorflow.python.keras import backend as K #Si hay una sesion de keras la 
 
 K.clear_session() #Matamos la sescion de keras anterior
 
-imaiterDirectory = './Entrenamiento' #Guardamos el directorio de las imaiteres
+imageDirectory = './Entrenamiento' #Guardamos el directorio de las imaiteres
 validationDirectory = './Validacion'
-csvDataDirectory = './Csv'
+csvDataDirectory = './Data_CSV/Saved_data.csv'
  
 iter = 5 #itereraciones #cambiar a 5-1 0
 alt = 150 # tamanio imaiteres 
@@ -41,38 +43,57 @@ conv2Filters = 64
 filter1Size =  (3,3) #tamanio de los filtros 
 filter2Size = (2,2)
 poolSize = (2,2)
-clas = 3 #curvasD, curvasI, rectas
+clas = 1 #curvasD, curvasI, rectas
 learnigRate = 0.0005 #ajustes de la red neuronal para ajuste optimo
 
 #meter datos csv y relacionar el nombre de la imaiter con cada Y(anguos de giro)
- #XTRain immaiteres //YTrain datos csv
+ #XTRain imagenes //YTrain datos csv
 
-#PREPROCESAMIENTO DE LAS IMAiterES
+#PREPROCESAMIENTO DE LAS IMAGENES
 
-dataiterTraining = ImageDataitererator(
+
+
+with open(csvDataDirectory) as csvfile:
+    reader = csv.DictReader(csvfile,  delimiter = ";")
+    for row in reader:
+        Ytrain =  (row['Angle'])
+        names = (row['Date'])
+
+
+
+
+imageTraining = ImageDataGenerator(
     rescale = 1./255, #los valores de los pixeles se reducen a 0 1
 )
 
-dataiterTraining = pd.read_csv(csvDataDirectory).values #cargamos el archivo csv
 
-dataiterValidation = ImageDataitererator(
+dataValidation = ImageDataGenerator(
     rescale = 1./255 #para validar las imaiteres tal cual son, sin girar ni zoom ni nada
 )
 
-trainingImage = dataiterTraining.flow_from_directory(#transformamos las imaiteres
-    imaiterDirectory,
+trainingImage = imageTraining.flow_from_directory(#transformamos las imagenes
+    imageDirectory,
     target_size = (alt,lon),
     batch_size = batchSize ,
-    class_mode = 'categorical' #clasifacion categorica de cada imiter, recta curbad y cubai
+    class_mode = 'categorical' 
 
 )
 
-validationImage = dataiterValidation.flow_from_directory(
+validationImage = dataValidation.flow_from_directory(
     validationDirectory,
     target_size = (alt,lon),
     batch_size = batchSize ,
     class_mode = 'categorical'
 )
+
+
+
+trainGenerator =  trainingImage.flow(  #Xtrain
+    trainingImage,
+    Ytrain, #Ytrain
+    names,
+    batch_size = batchSize
+).next()
 
 #CREAMOS LA RED CNN
 
@@ -83,7 +104,7 @@ cnn.add(#creamos la primera capa
         conv1Filters,  #32 filtros
         filter1Size, # de tamanio 3,3
         padding = 'same',
-        input_shape = (alt,lon,3),  #las imaiteres de entrada son de este tamanio
+        input_shape = (alt,lon,3),  #las imagenes de entrada son de este tamanio
         activation = 'relu' 
     )
 )
@@ -140,8 +161,8 @@ cnn.compile(
 )
 
 #Hcaer iterrador para meter imaiterers poco a poco
-cnn.fit_itererator( 
-    trainingImage,
+cnn.fit_generator( 
+    trainGenerator,
     steps_per_epoch = steps,
     epochs = iter,
     initial_epoch = 0,
