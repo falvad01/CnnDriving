@@ -7,28 +7,28 @@ import csv, operator
 import glob
 
 
-fields = ['Date','Speeed','Angle']
+fields = ['Speeed','Angle']
 
 
 csvDataDirectory = './Data_CSV/Saved_data.csv'
 
-
-X_data = []
-files = glob.glob ("./Entrenamiento/*.png")
-for myFile in files:
-    image = cv2.imread (myFile)
-    X_data.append (image)
-
-print('X_data shape:', np.array(X_data).shape)
-
-
-
-
-
+"""
 with open(csvDataDirectory) as csvfile:
-    reader = csv.DictReader(csvfile,  delimiter = ";")
+    reader = csv.DictReader(csvfile,  delimiter = ",")
     for row in reader:
         angles =  (row['Angle'])
+        print(angles)
 
+   """
+
+NImages = len(glob.glob("entrenamiento/*.jpg"))
+print("NUmero de imagesnes")
+print(NImages)
+
+
+#Metemos las imagenes en un array(XTRain)
+for i in range (NImages):
+    print("entrenamiento/{}.jpg".format(i))
+    imagen = cv2.imread("entrenamiento/{i}.jpg")
+    XTrain.append(imagen) 
     
-

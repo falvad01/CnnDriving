@@ -1,30 +1,11 @@
-#enconding: utf-8
-##si da error instalar pillow con CONDA NO CON PIP
-
-##DUDAS##
-##OPTIMIZACION EN UNITY
-##LAS IMAiterES DE ENTRENAMIENTO Y VALIDACION, DIFERENCIAS Y SI PUEDEN SER IGUALES
-##PROBLEMA AL CARGAR EL MODELO
-##EN LA RED ESTOY USANDO UNA FUNCION RELU Y UNA SOFTMAX, SERI AMEJOR CAMBAIRLAS POR UNA SIGMOIDAL???
-##A LA HORA DE CLASICAR LAS IMAiterES SERIA EN CURVAS DERECHA, CURVAS IZQUIERDA Y RECTAS O TENDRIA QUE PENSAR EN OTRO TIPO DE CLASIFICACION
-##NUMERO DE FOTOS OPTIMO PARA ENTRENAR LA RED
-##ERROES EN EL FROM, QUE SE SOLUCIONAN SOLOS
-##meter sleep en unity
- 
-
-import sys #movernos en nuestro So
-import os #movernos en nuestro So 
-import pandas as pd # data processing, CSV file
+import sys 
+import os 
+import pandas as pd 
 import numpy
 import csv, operator
-import cv2;
+import cv2
+import glob
 
-#import matplotlib.pyplot as plt
-
-from numpy import genfromtxt
-from scipy import misc
-from scipy import ndimage
-from PIL import Image 
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
 from tensorflow.python.keras.models import Sequential #Nos permite hacer redes neuronales secuenciales, para que las capas esten en orden
@@ -37,53 +18,42 @@ K.clear_session() #Matamos la sescion de keras anterior
 
 
  
-epochs = 5 #itereraciones #cambiar a 5-1 0
-alt = 150 # tamanio imaiteres 
+epochs = 5 
+alt = 150 # tamanio imagenes
 lon = 150
 batchSize = 32 
-validationSteps = 300 #todas las de validacion a la vez
 conv1Filters = 32 #profundidad de la imaiter en cada convolucion
 conv2Filters = 64
 filter1Size =  (3,3) #tamanio de los filtros 
 filter2Size = (2,2)
 poolSize = (2,2)
-clas = 1 #curvasD, curvasI, rectas
+clas = 1
 learnigRate = 0.0005 #ajustes de la red neuronal para ajuste optimo
-
-#meter datos csv y relacionar el nombre de la imaiter con cada Y(anguos de giro)
- #XTRain imagenes //YTrain datos csv
-
-#PREPROCESAMIENTO DE LAS IMAGENES
+XTrain= [] #Vector de imagenes
+NImages = 0
 
 
-imageDirectory = []
+NImages = len(glob.glob("entrenamiento/*.jpg"))
+
+#Metemos las imagenes en un array(XTRain)
+for i in range (NImages):
+   
+    imagen = cv2.imread("entrenamiento/{}.jpg".format(i))
+    XTrain.append(imagen)
 
 
-for i in range (100):
-    imagen = cv2.imread("entrenamoento/{i}.jpg")
-    imageDirectory.append(imagen)
-
-
-
+#Cargamos los archivos de los angulos de giro y los metemos en una lista(YTrain)
 csvDataDirectory = './Data_CSV/Saved_data.csv'
 with open(csvDataDirectory) as csvfile:
-    reader = csv.DictReader(csvfile,  delimiter = ";")
+    reader = csv.DictReader(csvfile,  delimiter = ",")
     for row in reader:
         Ytrain =  (row['Angle'])
-        names = (row['Date'])
+       
 
-
-
-
-
-
-
-
-imageTraining = ImageDataGenerator(
-    rescale = 1./255 #los valores de los pixeles se reducen a 0 1
+"""
+imageTraining = ImageDataGenerator( #TODO COMPROVAR A VER SI HAY QUE ELIMINAR ESTA PARTE
+   rescale = 1./255 #los valores de los pixeles se reducen a 0 1
 )
-
-
 
 
 trainingImage = imageTraining.flow_from_directory(#transformamos las imagenes
@@ -93,7 +63,7 @@ trainingImage = imageTraining.flow_from_directory(#transformamos las imagenes
     class_mode = 'binary' 
 
 )
-
+"""
 
 #CREAMOS LA RED CNN
 
@@ -145,6 +115,7 @@ cnn.add(
     Dropout(0,5) #durante el entrenamiento apagamos la mitad de las neuronas,esto nos permite evitar el sobreajuste
 )
 
+#TODO ESTA CAPA PUEDE SER ELIMINADA
 cnn.add(#ultima capa(6)
     Dense(
         clas,
@@ -155,7 +126,7 @@ cnn.add(#ultima capa(6)
 cnn.compile(
     loss = 'categorical_crossentropy', #indica si va bien o mal
     optimizer = optimizers.Adam(
-        lr = learnigRate #optimizador 
+         lr = learnigRate #optimizador 
     ),
     metrics = ['accuracy']
 )
@@ -165,13 +136,13 @@ cnn.compile(
 
 
 cnn.fit(
-    imageTraining, 
+    XTrain, 
     Ytrain, 
-    batch_size=None, 
-    epochs= epochs, 
+    batch_size=32, 
+    epochs= epochs, #Epocas de entrenamiento
     verbose=1, 
     callbacks=None, 
-    validation_split=0.2, 
+    validation_split=0.2, #cojemos el 20% de las imagnes para validacion
     validation_data=None, 
     shuffle=False 
     
@@ -185,17 +156,3 @@ os.mkdir(dir)
 
 cnn.save('./model/model.h5') #guardamos la estructura del modelo
 #cnn.save_weights('./model/model_wheights.h5') #guardamos los pesos de cada capa
-
-
-"""
-dir = './Data/' #directorio del modelo de salida
-os.mkdir(dir)
-## serialize model to JSON
-model_json = cnn.to_json()
-with open("Data/model.json", "w") as json_file:
-    json_file.write(simplejson.dumps(simplejson.loads(model_json), indent=4))
-
-# serialize weights to HDF5
-cnn.save_weights("Data/model.h5")
-print("Saved model to disk")
-"""
