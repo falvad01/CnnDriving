@@ -9,6 +9,7 @@
 ##A LA HORA DE CLASICAR LAS IMAiterES SERIA EN CURVAS DERECHA, CURVAS IZQUIERDA Y RECTAS O TENDRIA QUE PENSAR EN OTRO TIPO DE CLASIFICACION
 ##NUMERO DE FOTOS OPTIMO PARA ENTRENAR LA RED
 ##ERROES EN EL FROM, QUE SE SOLUCIONAN SOLOS
+##meter sleep en unity
  
 
 import sys #movernos en nuestro So
@@ -16,8 +17,14 @@ import os #movernos en nuestro So
 import pandas as pd # data processing, CSV file
 import numpy
 import csv, operator
+import cv2;
+
+#import matplotlib.pyplot as plt
 
 from numpy import genfromtxt
+from scipy import misc
+from scipy import ndimage
+from PIL import Image 
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator #Ayuda a preprocesar las imagenes
 from tensorflow.python.keras import optimizers #optimizar para entrenar el algotirmo
 from tensorflow.python.keras.models import Sequential #Nos permite hacer redes neuronales secuenciales, para que las capas esten en orden
@@ -28,16 +35,13 @@ from tensorflow.python.keras import backend as K #Si hay una sesion de keras la 
 
 K.clear_session() #Matamos la sescion de keras anterior
 
-imageDirectory = './Entrenamiento' #Guardamos el directorio de las imaiteres
-validationDirectory = './Validacion'
-csvDataDirectory = './Data_CSV/Saved_data.csv'
+
  
-iter = 5 #itereraciones #cambiar a 5-1 0
+epochs = 5 #itereraciones #cambiar a 5-1 0
 alt = 150 # tamanio imaiteres 
 lon = 150
 batchSize = 32 
-steps = 1000 # numero de veces que se procesa la imaiter por iter
-validationSteps = 200
+validationSteps = 300 #todas las de validacion a la vez
 conv1Filters = 32 #profundidad de la imaiter en cada convolucion
 conv2Filters = 64
 filter1Size =  (3,3) #tamanio de los filtros 
@@ -52,7 +56,16 @@ learnigRate = 0.0005 #ajustes de la red neuronal para ajuste optimo
 #PREPROCESAMIENTO DE LAS IMAGENES
 
 
+imageDirectory = []
 
+
+for i in range (100):
+    imagen = cv2.imread("entrenamoento/{i}.jpg")
+    imageDirectory.append(imagen)
+
+
+
+csvDataDirectory = './Data_CSV/Saved_data.csv'
 with open(csvDataDirectory) as csvfile:
     reader = csv.DictReader(csvfile,  delimiter = ";")
     for row in reader:
@@ -62,38 +75,25 @@ with open(csvDataDirectory) as csvfile:
 
 
 
+
+
+
+
 imageTraining = ImageDataGenerator(
-    rescale = 1./255, #los valores de los pixeles se reducen a 0 1
+    rescale = 1./255 #los valores de los pixeles se reducen a 0 1
 )
 
 
-dataValidation = ImageDataGenerator(
-    rescale = 1./255 #para validar las imaiteres tal cual son, sin girar ni zoom ni nada
-)
+
 
 trainingImage = imageTraining.flow_from_directory(#transformamos las imagenes
     imageDirectory,
     target_size = (alt,lon),
     batch_size = batchSize ,
-    class_mode = 'categorical' 
+    class_mode = 'binary' 
 
 )
 
-validationImage = dataValidation.flow_from_directory(
-    validationDirectory,
-    target_size = (alt,lon),
-    batch_size = batchSize ,
-    class_mode = 'categorical'
-)
-
-
-
-trainGenerator =  trainingImage.flow(  #Xtrain
-    trainingImage,
-    Ytrain, #Ytrain
-    names,
-    batch_size = batchSize
-).next()
 
 #CREAMOS LA RED CNN
 
@@ -104,14 +104,14 @@ cnn.add(#creamos la primera capa
         conv1Filters,  #32 filtros
         filter1Size, # de tamanio 3,3
         padding = 'same',
-        input_shape = (alt,lon,3),  #las imagenes de entrada son de este tamanio
+       # input_shape = (alt,lon,3),  #las imagenes de entrada son de este tamanio
         activation = 'relu' 
     )
 )
 
 cnn.add( #creamos una segunda capa
     MaxPooling2D( # de tipo maxPooling
-        pool_size = poolSize  #y este es su tamanio 
+        pool_size = poolSize  
     )
 )
 
@@ -161,14 +161,21 @@ cnn.compile(
 )
 
 #Hcaer iterrador para meter imaiterers poco a poco
-cnn.fit_generator( 
-    trainGenerator,
-    steps_per_epoch = steps,
-    epochs = iter,
-    initial_epoch = 0,
-    validation_data = validationImage,
-    validation_steps = validationSteps
-) #con los que vamos a entrenar la imaiter
+
+
+
+cnn.fit(
+    imageTraining, 
+    Ytrain, 
+    batch_size=None, 
+    epochs= epochs, 
+    verbose=1, 
+    callbacks=None, 
+    validation_split=0.2, 
+    validation_data=None, 
+    shuffle=False 
+    
+)
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
  
