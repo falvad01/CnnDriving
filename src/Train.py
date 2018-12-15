@@ -133,7 +133,7 @@ cnn.compile(
 
 #Hcaer iterrador para meter imaiterers poco a poco
 
-
+print("VAya mierda")
 
 cnn.fit(
     XTrain, 
