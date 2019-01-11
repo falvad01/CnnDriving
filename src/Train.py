@@ -1,6 +1,5 @@
 import sys 
 import os 
-import pandas as pd 
 import numpy
 import csv, operator
 import cv2
@@ -15,8 +14,6 @@ from tensorflow.python.keras import backend as K #Si hay una sesion de keras la 
 
 
 K.clear_session() #Matamos la sescion de keras anterior
-
-
  
 epochs = 5 
 alt = 150 # tamanio imagenes
@@ -29,17 +26,18 @@ filter2Size = (2,2)
 poolSize = (2,2)
 clas = 1
 learnigRate = 0.0005 #ajustes de la red neuronal para ajuste optimo
-XTrain= [] #Vector de imagenes
+XTrain = [] #Vector de imagenes
 NImages = 0
 
 
 NImages = len(glob.glob("entrenamiento/*.jpg"))
 
 #Metemos las imagenes en un array(XTRain)
+
 for i in range (NImages):
-   
     imagen = cv2.imread("entrenamiento/{}.jpg".format(i))
     XTrain.append(imagen)
+   
 
 
 #Cargamos los archivos de los angulos de giro y los metemos en una lista(YTrain)
@@ -49,21 +47,6 @@ with open(csvDataDirectory) as csvfile:
     for row in reader:
         Ytrain =  (row['Angle'])
        
-
-"""
-imageTraining = ImageDataGenerator( #TODO COMPROVAR A VER SI HAY QUE ELIMINAR ESTA PARTE
-   rescale = 1./255 #los valores de los pixeles se reducen a 0 1
-)
-
-
-trainingImage = imageTraining.flow_from_directory(#transformamos las imagenes
-    imageDirectory,
-    target_size = (alt,lon),
-    batch_size = batchSize ,
-    class_mode = 'binary' 
-
-)
-"""
 
 #CREAMOS LA RED CNN
 
@@ -124,33 +107,37 @@ cnn.add(#ultima capa(6)
 )
 
 cnn.compile(
-    loss = 'categorical_crossentropy', #indica si va bien o mal
     optimizer = optimizers.Adam(
          lr = learnigRate #optimizador 
     ),
+    loss = 'categorical_crossentropy', #indica si va bien o mal
     metrics = ['accuracy']
 )
 
 #Hcaer iterrador para meter imaiterers poco a poco
 
-print("VAya mierda")
-
 cnn.fit(
-    XTrain, 
+    XTrain,
     Ytrain, 
-    batch_size=32, 
+    batch_size=256, 
     epochs= epochs, #Epocas de entrenamiento
-    verbose=1, 
-    callbacks=None, 
-    validation_split=0.2, #cojemos el 20% de las imagnes para validacion
-    validation_data=None, 
-    shuffle=False 
-    
+    verbose=1,  
+    validation_split=0.4 #cojemos el 40% de las imagnes para validacion
 )
+
+"""
+tupla = (XTrain,Ytrain)
+cnn.fit_generator(
+    generator = tupla,
+    steps_per_epoch=500,
+    epochs = epochs,
+    verbose = 2,
+    validation_data= tupla
+)
+"""
 
 #GUARDAMOS EL MODELO EN UN ARCHIVO
  
-
 dir = './model/' #directorio del modelo de salida
 os.mkdir(dir)
 

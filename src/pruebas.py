@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from numpy import genfromtxt
 import cv2
 import csv, operator
@@ -12,14 +11,16 @@ fields = ['Speeed','Angle']
 
 csvDataDirectory = './Data_CSV/Saved_data.csv'
 
-"""
+
 with open(csvDataDirectory) as csvfile:
     reader = csv.DictReader(csvfile,  delimiter = ",")
     for row in reader:
         angles =  (row['Angle'])
-        print(angles)
+        speed = (row['Speed'])
+        print(speed)
 
-   """
+
+"""
 
 NImages = len(glob.glob("entrenamiento/*.jpg"))
 print("NUmero de imagesnes")
@@ -31,4 +32,4 @@ for i in range (NImages):
     print("entrenamiento/{}.jpg".format(i))
     imagen = cv2.imread("entrenamiento/{i}.jpg")
     XTrain.append(imagen) 
-    
+    """
