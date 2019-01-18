@@ -20,6 +20,7 @@ K.clear_session()
 
 #xTrain = []
 #yTrain = []
+'''
 img = []
 
 numImages = len(glob.glob("entrenamiento/*.jpg"))
@@ -29,7 +30,7 @@ for i in range (numImages):
     #realizar crop de las imagenes
     img.append(image)
    
-    
+ '''   
    
 
 xTrain=np.array(img,'float32')
@@ -47,6 +48,7 @@ with open('./Data_CSV/Saved_data.csv') as csvfile:
        # print(yTrain)
 
 
+generator = ImageDataGenerator(validation_split=0,4)
 
 model = Sequential()
 
@@ -65,11 +67,11 @@ model.summary()
 
 model.compile(optimizer = optimizers.adam(lr = 0.0005),loss = 'categorical_crossentropy',metrics = ['accuracy'])
 
-model.fit(xTrain,validation_split=0.2,shuffle=True,epochs=10 ) #Fallo en validation_split,
+model.fit(yTrain,validation_split=0.2,shuffle=True,epochs=10 ) #Fallo en validation_split,
 #por lo que intuimos un fallo en la introduccion de datos, pero no encontramo en el fallo, las imagenes estan
 #introducidas como un numpy array y los datos como un arry de floats
 
-
+model.fit_generator(generator.flow_from_directory('IMG',batch_size=32),steps_per_epoch=100,epochs=5,verbose=1,shuffle=True, initial_epoch=0)
 
 #scores = model.evaluate(xTrain, yTrain)
 #print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100)
